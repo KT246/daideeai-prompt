@@ -1,0 +1,4 @@
+interface:
+  display_name: "Production Engineering"
+  short_description: "Build secure, maintainable software"
+  default_prompt: "Use $production-engineering to design and implement this production feature."
