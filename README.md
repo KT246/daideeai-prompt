@@ -1,5 +1,19 @@
 # daideeai-prompt
 
+## Default administrator bootstrap
+
+Create `.env.local` from `.env.example` and set these runtime-only values:
+
+```env
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+DEFAULT_ADMIN_USERNAME=admin
+DEFAULT_ADMIN_PASSWORD=a-long-unique-password
+```
+
+Apply `supabase/migrations/202607190003_default_admin_username.sql`. The first request after a deployment creates the admin when its username does not exist. When it exists, the account is updated in place (including password and admin role), so no duplicate user is created. Password hashing is handled by Supabase Auth and the password is never stored in `profiles`.
+
+For Cloudflare Workers, configure `SUPABASE_SERVICE_ROLE_KEY` and `DEFAULT_ADMIN_PASSWORD` as **Secrets**, and `DEFAULT_ADMIN_USERNAME` as a variable or Secret in the Workers dashboard. Check `/api/health` for a clear bootstrap status; it never returns the password.
+
 DaideeAI Prompt — nền tảng tạo prompt lập trình đa ngôn ngữ cho ChatGPT, Codex, Cursor và Claude Code.
 
 ## Cloudflare Workers
