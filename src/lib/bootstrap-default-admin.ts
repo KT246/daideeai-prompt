@@ -1,12 +1,32 @@
 import "server-only";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { createClient } from "@supabase/supabase-js";
 
 type BootstrapResult = { ok: boolean; status: "created" | "updated" | "skipped" | "error"; message: string };
 type BootstrapConfig = { error: string } | { username: string; password: string; url: string; secretKey: string };
 let bootstrapPromise: Promise<BootstrapResult> | undefined;
 
-function config(): BootstrapConfig {
-  const username = process.env.DEFAULT_ADMIN_USERNAME?.trim(); const password = process.env.DEFAULT_ADMIN_PASSWORD; const url = process.env.NEXT_PUBLIC_SUPABASE_URL; const secretKey = process.env.SUPABASE_SECRET_KEY;
+async function runtimeEnvironment(): Promise<Record<string, unknown>> {
+  try {
+    const context = await getCloudflareContext({ async: true });
+    return { ...process.env, ...(context.env as unknown as Record<string, unknown>) };
+  } catch {
+    // `next build` and local Node.js execution do not have a Cloudflare request context.
+    return process.env;
+  }
+}
+
+const readEnvironmentValue = (environment: Record<string, unknown>, key: string) => {
+  const value = environment[key];
+  return typeof value === "string" ? value : undefined;
+};
+
+async function config(): Promise<BootstrapConfig> {
+  const environment = await runtimeEnvironment();
+  const username = readEnvironmentValue(environment, "DEFAULT_ADMIN_USERNAME")?.trim();
+  const password = readEnvironmentValue(environment, "DEFAULT_ADMIN_PASSWORD");
+  const url = readEnvironmentValue(environment, "NEXT_PUBLIC_SUPABASE_URL");
+  const secretKey = readEnvironmentValue(environment, "SUPABASE_SECRET_KEY");
   if (!username || !password || !url || !secretKey) return { error: "Thiếu biến môi trường: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY, DEFAULT_ADMIN_USERNAME hoặc DEFAULT_ADMIN_PASSWORD." };
   if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username)) return { error: "DEFAULT_ADMIN_USERNAME chỉ được gồm chữ, số, dấu chấm, gạch dưới hoặc gạch nối (3-40 ký tự)." };
   if (password.length < 8) return { error: "DEFAULT_ADMIN_PASSWORD phải có ít nhất 8 ký tự." };
@@ -15,7 +35,7 @@ function config(): BootstrapConfig {
 const bootstrapEmail = (username: string) => `${username.toLowerCase()}@bootstrap.daideeai.local`;
 
 async function bootstrap(): Promise<BootstrapResult> {
-  const values = config(); if ("error" in values) return { ok: false, status: "skipped", message: values.error };
+  const values = await config(); if ("error" in values) return { ok: false, status: "skipped", message: values.error };
   const { username, password, url, secretKey } = values;
   const admin = createClient(url, secretKey, { auth: { autoRefreshToken: false, persistSession: false } });
   async function syncAdmin(id: string): Promise<BootstrapResult> {
