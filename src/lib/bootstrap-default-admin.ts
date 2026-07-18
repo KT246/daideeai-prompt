@@ -2,22 +2,22 @@ import "server-only";
 import { createClient } from "@supabase/supabase-js";
 
 type BootstrapResult = { ok: boolean; status: "created" | "updated" | "skipped" | "error"; message: string };
-type BootstrapConfig = { error: string } | { username: string; password: string; url: string; serviceRoleKey: string };
+type BootstrapConfig = { error: string } | { username: string; password: string; url: string; secretKey: string };
 let bootstrapPromise: Promise<BootstrapResult> | undefined;
 
 function config(): BootstrapConfig {
-  const username = process.env.DEFAULT_ADMIN_USERNAME?.trim(); const password = process.env.DEFAULT_ADMIN_PASSWORD; const url = process.env.NEXT_PUBLIC_SUPABASE_URL; const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!username || !password || !url || !serviceRoleKey) return { error: "Thiếu biến môi trường: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, DEFAULT_ADMIN_USERNAME hoặc DEFAULT_ADMIN_PASSWORD." };
+  const username = process.env.DEFAULT_ADMIN_USERNAME?.trim(); const password = process.env.DEFAULT_ADMIN_PASSWORD; const url = process.env.NEXT_PUBLIC_SUPABASE_URL; const secretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!username || !password || !url || !secretKey) return { error: "Thiếu biến môi trường: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SECRET_KEY, DEFAULT_ADMIN_USERNAME hoặc DEFAULT_ADMIN_PASSWORD." };
   if (!/^[a-zA-Z0-9._-]{3,40}$/.test(username)) return { error: "DEFAULT_ADMIN_USERNAME chỉ được gồm chữ, số, dấu chấm, gạch dưới hoặc gạch nối (3-40 ký tự)." };
   if (password.length < 8) return { error: "DEFAULT_ADMIN_PASSWORD phải có ít nhất 8 ký tự." };
-  return { username, password, url, serviceRoleKey };
+  return { username, password, url, secretKey };
 }
 const bootstrapEmail = (username: string) => `${username.toLowerCase()}@bootstrap.daideeai.local`;
 
 async function bootstrap(): Promise<BootstrapResult> {
   const values = config(); if ("error" in values) return { ok: false, status: "skipped", message: values.error };
-  const { username, password, url, serviceRoleKey } = values;
-  const admin = createClient(url, serviceRoleKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const { username, password, url, secretKey } = values;
+  const admin = createClient(url, secretKey, { auth: { autoRefreshToken: false, persistSession: false } });
   async function syncAdmin(id: string): Promise<BootstrapResult> {
     const { error: passwordError } = await admin.auth.admin.updateUserById(id, { password, email_confirm: true, user_metadata: { full_name: username } });
     if (passwordError) return { ok: false, status: "error", message: `Không thể cập nhật mật khẩu tài khoản mặc định: ${passwordError.message}` };
