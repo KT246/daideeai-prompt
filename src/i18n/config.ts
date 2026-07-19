@@ -1,8 +1,8 @@
-export const locales = ["vi", "en", "th", "lo"] as const;
+/** The product is intentionally available only in Lao and English. */
+export type Locale = "lo" | "en";
+export const locales = ["lo", "en"] as const;
 
-export type Locale = (typeof locales)[number];
-
-export const defaultLocale: Locale = "vi";
+export const defaultLocale: Locale = "en";
 export const localeCookieName = "daideeai-prompt-locale";
 
 export function isLocale(value: string | undefined): value is Locale {

@@ -12,5 +12,5 @@ export function AuthMenu() {
   const { t } = useI18n();
   useEffect(() => { if (!isSupabaseConfigured) return; const supabase = createClient(); void supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null)); const { data: listener } = supabase.auth.onAuthStateChange((_, session) => setEmail(session?.user.email ?? null)); return () => listener.subscription.unsubscribe(); }, []);
   if (!email) return <Button asChild size="sm"><Link href="/login"><LogIn className="size-4" />{t("nav.login")}</Link></Button>;
-  return <Button asChild variant="secondary" size="sm" title={email}><Link href="/account/history"><UserRound className="size-4" /><span className="hidden sm:inline">{t("nav.account")}</span></Link></Button>;
+  return <Button asChild variant="secondary" size="sm" title={email}><Link href="/admin"><UserRound className="size-4" /><span className="hidden sm:inline">{t("admin.menu")}</span></Link></Button>;
 }

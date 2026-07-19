@@ -9,7 +9,10 @@ import { getServerTranslator } from "@/i18n/server";
 import { getPrompts } from "@/lib/prompts";
 import { categoryLabels, promptCategories } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Prompt Library" };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return { title: t("library.title") };
+}
 type SearchParams = Promise<{ q?: string; category?: string; technology?: string; access?: "free" | "pro"; sort?: "newest" | "popular"; page?: string }>;
 
 export default async function PromptsPage({ searchParams }: { searchParams: SearchParams }) {

@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { Providers } from "@/components/providers";
 import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
-import { getServerLocale } from "@/i18n/server";
+import { getServerLocale, getServerTranslator } from "@/i18n/server";
 import { siteConfig } from "@/lib/site";
 import { ensureDefaultAdmin } from "@/lib/bootstrap-default-admin";
 import "./globals.css";
 
-export const metadata: Metadata = { title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` }, description: siteConfig.description, metadataBase: new URL(siteConfig.url) };
+export async function generateMetadata(): Promise<Metadata> {
+  const { t } = await getServerTranslator();
+  return { metadataBase: new URL(siteConfig.url), title: { default: siteConfig.name, template: `%s | ${siteConfig.name}` }, description: t("metadata.description") };
+}
 
 export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   await ensureDefaultAdmin();

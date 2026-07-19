@@ -1,5 +1,7 @@
 # daideeai-prompt
 
+DaideeAI Prompt is a Lao- and English-language platform for creating programming prompts for ChatGPT, Codex, Cursor, and Claude Code.
+
 ## Default administrator bootstrap
 
 Create `.env.local` from `.env.example` and set these runtime-only values:
@@ -14,22 +16,20 @@ Apply `supabase/migrations/202607190003_default_admin_username.sql`. The first r
 
 For Cloudflare Workers, configure `SUPABASE_SECRET_KEY` and `DEFAULT_ADMIN_PASSWORD` as **Secrets**, and `DEFAULT_ADMIN_USERNAME` as a variable or Secret in the Workers dashboard. Check `/api/health` for a clear bootstrap status; it never returns the password.
 
-DaideeAI Prompt — nền tảng tạo prompt lập trình đa ngôn ngữ cho ChatGPT, Codex, Cursor và Claude Code.
-
 ## Cloudflare Workers
 
-Ứng dụng dùng OpenNext adapter để deploy Next.js lên Cloudflare Workers.
+The application uses the OpenNext adapter to deploy Next.js on Cloudflare Workers.
 
 ```bash
-npm run preview                 # kiểm tra bằng workerd/Wrangler
-npm run deploy                  # build OpenNext và deploy production
-npm run cf-versions-upload     # upload preview version, chưa promote production
+npm run preview                 # test with workerd/Wrangler
+npm run deploy                  # build OpenNext and deploy production
+npm run cf-versions-upload      # upload a preview version without promoting it
 ```
 
-Trong Cloudflare Workers Builds, đặt:
+In Cloudflare Workers Builds, set:
 
 - Build command: `npm run build:cloudflare`
 - Deploy command: `npx wrangler deploy`
 - Preview deploy command: `npx wrangler versions upload`
 
-Khai báo `NEXT_PUBLIC_SUPABASE_URL` và `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` trong Build Variables and secrets của Cloudflare. Không commit `.env.local` hoặc secret Supabase.
+Set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` in Cloudflare Build Variables and secrets. Never commit `.env.local` or a Supabase secret.

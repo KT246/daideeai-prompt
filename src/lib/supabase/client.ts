@@ -8,6 +8,6 @@ const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
 export const isSupabaseConfigured = Boolean(url && key);
 
 export function createClient() {
-  if (!url || !key) throw new Error("Thiếu cấu hình Supabase phía client.");
+  if (!url || !key) throw new Error("Missing Supabase client configuration.");
   return createBrowserClient(url, key);
 }

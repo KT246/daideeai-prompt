@@ -11,7 +11,7 @@ import { useI18n } from "@/components/i18n-provider";
 export function SiteHeader() {
   const { t } = useI18n();
   const links = [
-    [t("nav.explore"), "/prompts"], [t("nav.builder"), "/generators/builder"], [t("nav.crud"), "/generators/crud"], [t("nav.debugging"), "/generators/debugging"], [t("nav.system"), "/generators/system-checking"], [t("nav.pricing"), "/pricing"],
+    [t("nav.explore"), "/prompts"], [t("nav.builder"), "/generators/builder"], [t("nav.crud"), "/generators/crud"], [t("nav.debugging"), "/generators/debugging"], [t("nav.system"), "/generators/system-checking"],
   ] as const;
   return <header className="sticky top-0 z-40 border-b bg-[color:var(--background)]/90 backdrop-blur"><div className="mx-auto flex h-16 max-w-7xl items-center gap-3 px-4">
     <Link href="/" className="flex shrink-0 items-center gap-2 font-bold"><span className="grid size-8 place-items-center rounded-lg bg-violet-600 text-white"><Code2 className="size-4" /></span><span>DaideeAI Prompt</span></Link>
